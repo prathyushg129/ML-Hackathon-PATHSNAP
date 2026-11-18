@@ -180,6 +180,18 @@ class Trip:
             return settled
 
         emissions = np.log(np.clip(probabilities, 1e-9, 1))
+        heading_weight = settings.get("smoothed_heading_weight", 0)
+        if heading_weight:
+            # A short window reduces the influence of a noisy single GPS step.
+            rows = np.arange(len(ids))
+            left = np.maximum(rows - 3, 0)
+            right = np.minimum(rows + 3, len(ids) - 1)
+            displacement = self.xy[right] - self.xy[left]
+            span = self.track[right, 2] - self.track[left, 2]
+            moving = (np.linalg.norm(displacement, axis=1) >= 15) & (span <= 30)
+            direction = unit_vectors(displacement)
+            agreement = (direction[:, None, :] * self.direction[ids]).sum(axis=-1)
+            emissions = emissions + heading_weight * agreement * moving[:, None]
         score = emissions[0]
         back = np.zeros(ids.shape, dtype=int)
         for row in range(1, len(ids)):
@@ -225,8 +237,9 @@ class Trip:
 DECODER = {
     "gap_seconds": 60,
     "routing_limit_m": 1500,
-    "transition_scale_m": 35,
-    "disconnect_penalty": 18,
+    "transition_scale_m": 55,
+    "disconnect_penalty": 12,
+    "smoothed_heading_weight": 2,
 }
 
 

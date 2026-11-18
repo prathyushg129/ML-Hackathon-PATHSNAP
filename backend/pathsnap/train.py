@@ -276,6 +276,7 @@ def main():
         "objective": "mean grouped-CV candidate macro F1", "trials": trials,
         "tuned_fit_seconds": fit_seconds, "tuned_student_test": tuned_results,
         "decoder_comparison": decoder_results,
+        "decoder_settings": artifact["decoder"],
     }
     (output / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
     (output / "inventory.json").write_text(json.dumps(inventory, indent=2), encoding="utf-8")

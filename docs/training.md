@@ -11,7 +11,7 @@
 
 The full run fits seven classifiers on 80 training trips and evaluates on the ten student-test trips. The comparison includes Logistic Regression, Gaussian Naive Bayes, Random Forest, Extra Trees, Histogram Gradient Boosting, a multilayer perceptron (MLP), and XGBoost. Use the same three trip-grouped cross-validation folds for every model. The workflow chooses a model by mean CV candidate Macro F1 and runs a Bayesian search over that model's hyperparameters.
 
-The exported decoder uses fixed transition settings. Results include tuned versus untuned comparisons and an evaluation with and without decoding. The provided route file contains an ordered arc sequence, so pointwise scores use labels derived by monotone GPS-to-reference-route alignment. Route continuity measures directly adjacent predicted arcs, and arc-overlap F1 is a multiset score.
+The exported decoder uses a 55 m transition scale, a disconnection penalty of 12, and a smoothed heading weight of 2. A short window around each GPS observation estimates direction; the heading contribution is applied when the window covers at least 15 m and at most 30 seconds. These settings were selected on training trips before the student-test evaluation. Results include tuned versus untuned comparisons and an evaluation with and without decoding. The provided route file contains an ordered arc sequence, so pointwise scores use labels derived by monotone GPS-to-reference-route alignment. Route continuity measures directly adjacent predicted arcs, and arc-overlap F1 is a multiset score.
 
 ## Read the experiment results
 
@@ -28,3 +28,5 @@ Open [the full Colab results](../artifacts/results.json). Each entry under `mode
 | Inference time | `student_test.inference_seconds` covers classifier evaluation across all ten test trips with features already prepared. API timing also includes file loading, feature generation, decoding, and scoring. |
 
 Compare the selected model's original `student_test` entry with `tuned_student_test` to report the effect of Bayesian tuning. Use `decoder_comparison` to compare the tuned classifier alone with the tuned classifier plus HMM/Viterbi. Its `per_trip` entries show how the effect varies by trip.
+
+Folium exports use the supplied road network as the background and do not request external map tiles. For fully offline HTML, run the visualisation module with `--leaflet-assets` pointing to the installed Leaflet distribution folder.
