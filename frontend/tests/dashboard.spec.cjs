@@ -97,3 +97,36 @@ test('empty trip lists, invalid JSON, and mobile layout', async ({page}, testInf
  await expect(page.locator('#run')).toBeDisabled();
  await page.screenshot({path:testInfo.outputPath('dark-mobile.png'),fullPage:true});
 });
+
+test('every API-returned trip remains selectable and predictable', async ({page}) => {
+ const ids = ['0000', '0007', '0099', '0100', '0200', '1001', '3456', '7000', '9001', '9999'];
+ const predictedIds = [];
+ await page.route('https://**/*', route => route.abort());
+ await page.route('http://127.0.0.1:8000/**', route => {
+   const request = route.request();
+   const path = new URL(request.url()).pathname;
+   if (path === '/health') return route.fulfill({json:{status:'ready',trip_count:ids.length}});
+   if (path === '/trips') return route.fulfill({json:{trip_ids:ids}});
+   const id = decodeURIComponent(path.split('/')[2]);
+   expect(ids).toContain(id);
+   expect(request.method()).toBe('POST');
+   expect(request.postData()).toBeNull();
+   predictedIds.push(id);
+   return route.fulfill({json:{
+     trip_id:id, observation_count:1, observations:[[77,12,123]],
+     predicted_route:[{arc_id:1,coordinates:[[77,12],[77.01,12.01]]}],
+     metrics:{pointwise_accuracy:1,processing_seconds:0.01},
+   }});
+ });
+ await page.goto('/');
+ await expect(page.locator('#trip option')).toHaveText(ids);
+ for (const id of ids) {
+   await page.locator('#trip').selectOption(id);
+   await expect(page.locator('#trip')).toHaveValue(id);
+   await page.locator('#run').click();
+   await expect(page.locator('#result-trip')).toHaveText(id);
+   await expect(page.locator('#status')).toHaveText('Prediction complete for trip ' + id + '.');
+   await expect(page.locator('#run')).toBeEnabled();
+ }
+ expect(predictedIds).toEqual(ids);
+});
