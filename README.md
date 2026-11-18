@@ -17,9 +17,9 @@ The classifier scores candidate roads for each observation. The decoder uses roa
 
 ## Results at a glance
 
-The full Colab run compared seven classifiers across three trip-grouped cross-validation folds. Tuned Histogram Gradient Boosting was selected for deployment. On the ten student-test trips, pointwise accuracy rose from **82.08%** with the classifier alone to **89.01%** with HMM/Viterbi.
+The full Colab run compared seven classifiers across three trip-grouped cross-validation folds. Tuned Histogram Gradient Boosting was selected for deployment. On the ten student-test trips, pooled pointwise accuracy rose from **82.08%** with the classifier alone to **90.37%** with HMM/Viterbi. Mean trip accuracy was **91.41%** with equal weight per trip.
 
-See the [comparison chart](artifacts/model-comparison.png), [experiment results](artifacts/results.json), and [metric definitions](docs/training.md#read-the-experiment-results).
+See the [comparison chart](artifacts/model-comparison.png), the [per-trip decoder chart](artifacts/decoder-accuracy-by-trip.png), [experiment results](artifacts/results.json), and [metric definitions](docs/training.md#read-the-experiment-results).
 
 ## Repository layout
 
