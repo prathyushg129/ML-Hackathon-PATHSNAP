@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+.smoke/
+data/
+Student folder.zip
+pathsnap-source.zip
+PathSnap-backend.zip
+pathsnap-artifacts.zip
+evaluator_test.zip
+/artifacts/inventory.json
+/artifacts/student-trip-map.*
+/output/pdf/PathSnap-Technical-Report.pdf
+.ipynb_checkpoints/
